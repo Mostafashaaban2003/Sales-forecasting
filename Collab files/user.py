@@ -197,21 +197,194 @@ def edit_password(password):
 
 
 
-# to predict sales
 def predict_sales():
-    choice = input("Enter 1 for \"first branch\" or 2 for \"second branch\" or 3 for \"thired branch\" ")
-    if (choice == '1'):
-        supervised_data1 = monthly_sales1.drop(['date', 'sales'], axis=1)
-        for i1 in range(1, 13):
-            col_name1 = 'month_' + str(i1)
-            supervised_data1[col_name1] = supervised_data1['sales_diff'].shiht(i1)
-        supervised_data1 = supervised_data1.dropna().reset_index(drop=True)
-        # split the data into train and test
-        train_data1 = supervised_data1[:-12]
-        test_data1 = supervised_data1[-12:]
-        scaler1 = MinMaxScaler(feature_range=(-1, 1))
-        scaler1.fit(train_data1)
-        train_data1 = scaler1.transform(train_data1)
-        test_data1 = scaler1.transform(test_data1)
-        x_train1, y_train1 = train_data1[:, 1:], test_data1[:, 0:1]
-        x_test1, y_test1 = test_data1[:, 1:], test_data1[:, 0:1]
+        choice = input("Enter 1 for \"first branch\" or 2 for \"second branch\" or 3 for \"thired branch\" ")
+        if(choice=='1'):
+          supervised_data1=monthly_sales1.drop(['date','sales'],axis=1)
+          for i1 in range(1,13):
+              col_name1='month_'+str(i1)
+              supervised_data1[col_name1]=supervised_data1['sales diff'].shift(i1)
+          supervised_data1=supervised_data1.dropna().reset_index(drop=True)
+          #split the data into train and test
+          train_data1=supervised_data1[:-94]
+          test_data1=supervised_data1[-12:]
+          
+          scaler1=MinMaxScaler(feature_range=(-1,1))
+          scaler1.fit(train_data1)
+          train_data1=scaler1.transform(train_data1)
+          test_data1=scaler1.transform(test_data1)
+          
+          x_train1,y_train1=train_data1[:,1:],train_data1[:,0:1]
+          x_test1,y_test1=test_data1[:,1:],test_data1[:,0:1]
+          y_train1=y_train1.ravel()
+          y_test1=y_test1.ravel()
+           #make prediction data frame
+          sales_dates1=monthly_sales1['date'][-12:].reset_index(drop=True)
+          predict_df1=pd.DataFrame(sales_dates1)
+          act_sales1=monthly_sales1['sales'][-24:].to_list()
+           #creat linear regression model and predicted output
+          lr_model1=LinearRegression()
+          lr_model1.fit(x_train1,y_train1)
+          lr_pre1=lr_model1.predict(x_test1)
+          
+          lr_pre1=lr_pre1.reshape(-1,1)
+           #matrix contains the output of the predicted data and test data input
+          lr_pre_test_set1=np.concatenate([lr_pre1,x_test1],axis=1)
+          lr_pre_test_set1=scaler1.inverse_transform(lr_pre_test_set1)
+          
+          result_list1=[]
+          for index in range(0,len(lr_pre_test_set1)):
+               result_list1.append(lr_pre_test_set1[index][0]+act_sales1[index])
+          lr_pre_series1=pd.Series(result_list1,name='linear prediction')
+          predict_df1=predict_df1.merge(lr_pre_series1,left_index=True,right_index=True)
+          #Erorrs of prediction
+          answer1=input("if you want to display errors of prediction press \"y\" if you don't press anything else: ")
+          if answer1=="y":
+           lr_mse1=np.sqrt(mean_squared_error(predict_df1['linear prediction'],monthly_sales1['sales'][-12:]))
+           lr_mae1=mean_absolute_error(predict_df1['linear prediction'],monthly_sales1['sales'][-12:])
+           lr_r2_1=r2_score(predict_df1['linear prediction'],monthly_sales1['sales'][-12:])
+           print("Linear regression MSE:  ",lr_mse1)
+           print("linear regression MAE: ",lr_mae1)
+           print("linear regression R2: ",lr_r2_1 )
+          answer_of_graph1=input("If you want to display the graph press \"y\" if you don't press anything else: ") 
+          if answer_of_graph1=="y":
+              
+             
+                  plt.figure(figsize=(15,5))
+                  #actual sales
+                  plt.plot(monthly_sales1['date'][:-12],monthly_sales1['sales'][:-12])
+                  #predicted sales
+                  plt.plot(predict_df1['date'],predict_df1['linear prediction'])
+                  plt.xlabel('Date')
+                  plt.ylabel('Sales')
+                  plt.title('Sales forcasting')
+                  plt.legend(["Actual sales","Predicted sales"])
+                  plt.show()
+           
+           
+            
+        elif(choice=='2'):
+             supervised_data2=monthly_sales2.drop(['date','sales'],axis=1)
+             for i2 in range(1,13):
+                 col_name2='month_'+str(i2)
+                 supervised_data2[col_name2]=supervised_data2['sales diff'].shift(i2)
+             supervised_data2=supervised_data2.dropna().reset_index(drop=True)
+             #split the data into train and test
+             train_data2=supervised_data2[:-94]
+             test_data2=supervised_data2[-12:]
+             
+             scaler2=MinMaxScaler(feature_range=(-1,1))
+             scaler2.fit(train_data2)
+             train_data2=scaler2.transform(train_data2)
+             test_data2=scaler2.transform(test_data2)
+             
+             x_train2,y_train2=train_data2[:,1:],train_data2[:,0:1]
+             x_test2,y_test2=test_data2[:,1:],test_data2[:,0:1]
+             y_train2=y_train2.ravel()
+             y_test2=y_test2.ravel()
+              #make prediction data frame
+             sales_dates2=monthly_sales2['date'][-12:].reset_index(drop=True)
+             predict_df2=pd.DataFrame(sales_dates2)
+             act_sales2=monthly_sales2['sales'][-24:].to_list()
+              #creat linear regression model and predicted output
+             lr_model2=LinearRegression()
+             lr_model2.fit(x_train2,y_train2)
+             lr_pre2=lr_model2.predict(x_test2)
+             
+             lr_pre2=lr_pre2.reshape(-1,1)
+              #matrix contains the output of the predicted data and test data input
+             lr_pre_test_set2=np.concatenate([lr_pre2,x_test2],axis=1)
+             lr_pre_test_set2=scaler2.inverse_transform(lr_pre_test_set2)
+             
+             result_list2=[]
+             for index in range(0,len(lr_pre_test_set2)):
+                  result_list2.append(lr_pre_test_set2[index][0]+act_sales2[index])
+             lr_pre_series2=pd.Series(result_list2,name='linear prediction')
+             predict_df2=predict_df2.merge(lr_pre_series2,left_index=True,right_index=True)
+             #Erorrs of prediction
+             answer2=input("if you want to display errors of prediction press \"y\" if you don't press anything else: ")
+             if answer2=="y":
+              lr_mse2=np.sqrt(mean_squared_error(predict_df2['linear prediction'],monthly_sales2['sales'][-12:]))
+              lr_mae2=mean_absolute_error(predict_df2['linear prediction'],monthly_sales2['sales'][-12:])
+              lr_r2_2=r2_score(predict_df2['linear prediction'],monthly_sales2['sales'][-12:])
+              print("Linear regression MSE:  ",lr_mse2)
+              print("linear regression MAE: ", lr_mae2)
+              print("linear regression R2: ",lr_r2_2 )
+             answer_of_graph2=input("If you want to display the graph press \"y\" if you don't press anything else: ") 
+             if answer_of_graph2=="y":
+                 plt.figure(figsize=(15,5))
+                 #actual sales
+                 plt.plot(monthly_sales2['date'][:-12],monthly_sales2['sales'][:-12])
+                 #predicted sales
+                 plt.plot(predict_df2['date'],predict_df2['linear prediction'])
+                 plt.xlabel('Date')
+                 plt.ylabel('Sales')
+                 plt.title('Sales forcasting')
+                 plt.legend(["Actual sales","Predicted sales"])
+                 plt.show()
+           
+        elif(choice=='3'):
+                 supervised_data3=monthly_sales3.drop(['date','sales'],axis=1)
+                 for i3 in range(1,13):
+                     col_name3='month_'+str(i3)
+                     supervised_data3[col_name3]=supervised_data3['sales diff'].shift(i3)
+                 supervised_data3=supervised_data3.dropna().reset_index(drop=True)
+                 #split the data into train and test
+                 train_data3=supervised_data3[:-94]
+                 test_data3=supervised_data3[-12:]
+                 
+                 scaler3=MinMaxScaler(feature_range=(-1,1))
+                 scaler3.fit(train_data3)
+                 train_data3=scaler3.transform(train_data3)
+                 test_data3=scaler3.transform(test_data3)
+                 
+                 x_train3,y_train3=train_data3[:,1:],train_data3[:,0:1]
+                 x_test3,y_test3=test_data3[:,1:],test_data3[:,0:1]
+                 y_train3=y_train3.ravel()
+                 y_test3=y_test3.ravel()
+                  #make prediction data frame
+                 sales_dates3=monthly_sales3['date'][-12:].reset_index(drop=True)
+                 predict_df3=pd.DataFrame(sales_dates3)
+                 act_sales3=monthly_sales3['sales'][-24:].to_list()
+                  #creat linear regression model and predicted output
+                 lr_model3=LinearRegression()
+                 lr_model3.fit(x_train3,y_train3)
+                 lr_pre3=lr_model3.predict(x_test3)
+                 
+                 lr_pre3=lr_pre3.reshape(-1,1)
+                  #matrix contains the output of the predicted data and test data input
+                 lr_pre_test_set3=np.concatenate([lr_pre3,x_test3],axis=1)
+                 lr_pre_test_set3=scaler3.inverse_transform(lr_pre_test_set3)
+                 
+                 result_list3=[]
+                 for index in range(0,len(lr_pre_test_set3)):
+                      result_list3.append(lr_pre_test_set3[index][0]+act_sales3[index])
+                 lr_pre_series3=pd.Series(result_list3,name='linear prediction')
+                 predict_df3=predict_df3.merge(lr_pre_series3,left_index=True,right_index=True)
+                 #Erorrs of prediction
+                 answer3=input("if you want to display errors of prediction press \"y\" if you don't press anything else: ")
+                 if answer3=="y":
+                  lr_mse3=np.sqrt(mean_squared_error(predict_df3['linear prediction'],monthly_sales3['sales'][-12:]))
+                  lr_mae3=mean_absolute_error(predict_df3['linear prediction'],monthly_sales3['sales'][-12:])
+                  lr_r2_3=r2_score(predict_df3['linear prediction'],monthly_sales3['sales'][-12:])
+                  print("Linear regression MSE:  ",lr_mse3)
+                  print("linear regression MAE: ", lr_mae3)
+                  print("linear regression R2: ",lr_r2_3 )
+                 answer_of_graph3=input("If you want to display the graph press \"y\" if you don't press anything else: ") 
+                 if answer_of_graph3=="y":
+                     plt.figure(figsize=(15,5))
+                     #actual sales
+                     plt.plot(monthly_sales3['date'][:-12],monthly_sales3['sales'][:-12])
+                     #predicted sales
+                     plt.plot(predict_df3['date'],predict_df3['linear prediction'])
+                     plt.xlabel('Date')
+                     plt.ylabel('Sales')
+                     plt.title('Sales forcasting')
+                     plt.legend(["Actual sales","Predicted sales"])
+                     plt.show()
+           
+
+        else:
+              print("unexpected value")
+              predict_sales()
+    
