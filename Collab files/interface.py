@@ -1,6 +1,4 @@
-
 import user
-
 passowrd1 = "142003"
 password2 = "1234"
 def system_init():
@@ -16,7 +14,7 @@ def system_init():
               "1. Display store sales\n"
               "2. Display all sales\n"
               "3. Display monthly sales\n"
-              "4. Display upcoming sales forecast\n"
+              "4. Display predicted and actual sales\n"
               "5. Edit password\n"
               "6. Add or Edit sales record\n"
               "7. Remove sales record\n"
@@ -32,7 +30,7 @@ def system_init():
         elif(choice == 4):
             user.predict_sales()
         elif (choice == 5):
-            user.edit_password()
+            user.edit_password(passowrd1)
         elif (choice == 6):
             user.add_or_edit_sales_record()
         elif (choice == 7):
@@ -47,7 +45,7 @@ def system_init():
               "1. Display sales record\n"
               "2. Display all sales\n"
               "3. Display monthly sales\n"
-              "4. Display upcoming sales forecast\n"
+              "4. Display predicted and actual sales\n"
               "5. Edit password\n"
               "6. Logout\n"
               "7. Exit\n")
@@ -61,7 +59,7 @@ def system_init():
         elif(choice == 4):
             user.predict_sales()
         elif (choice == 5):
-            user.edit_password()
+            user.edit_password(password2)
         elif (choice == 6):
             system_init()
         elif (choice == 7):
